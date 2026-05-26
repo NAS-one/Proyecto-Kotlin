@@ -36,7 +36,7 @@ La app incluye las siguientes pantallas:
 | **S** - Single Responsibility | Cada clase (ViewModel, UseCase, Repository) tiene una sola responsabilidad |
 | **O** - Open/Closed | `FoodPlaceFormScreen` reutilizado para crear y editar sin modificación |
 | **L** - Liskov Substitution | Las implementaciones de repositorios son intercambiables |
-| **I** - Interface Segregation | Interfaces separadas para `UserRepository`, `FoodPlaceRepository`, `RouteRepository` |
+| **I** - Interface  | Interfaces separadas para `UserRepository`, `FoodPlaceRepository`, `RouteRepository` |
 | **D** - Dependency Inversion | Los UseCases dependen de interfaces, no de implementaciones concretas |
 
 ## Tecnologías
@@ -77,6 +77,6 @@ La app incluye 12 locales de comida reales de Osorno:
 - Rincón Cervecero
 - Emporio Sureño
 
-## 👤 Autor
+## 👤 Javier Uribe, Nicolás Almuna
 
 Proyecto académico - Desarrollo de Aplicaciones Móviles con Kotlin
