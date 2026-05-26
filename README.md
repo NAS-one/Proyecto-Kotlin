@@ -1,4 +1,4 @@
-# 🍽️ Osorno Food Routes
+# 🍽️ Rutas de comida Osorno
 
 Aplicación móvil Android desarrollada en **Kotlin** con **Jetpack Compose** para explorar rutas de locales de comida en la ciudad de **Osorno, Chile**.
 
@@ -14,15 +14,6 @@ La app incluye las siguientes pantallas:
 ## Arquitectura
 
 ### Clean Architecture (3 Capas)
-```
-┌─────────────────────────────────┐
-│   Presentation (UI + MVVM)      │  → Compose Screens + ViewModels
-├─────────────────────────────────┤
-│   Domain (Negocio)              │  → Models + UseCases + Interfaces
-├─────────────────────────────────┤
-│   Data (Persistencia)           │  → Room DB + Repository Impl
-└─────────────────────────────────┘
-```
 
 ### MVVM (Model-View-ViewModel)
 - **Model**: Entidades de dominio (`User`, `FoodPlace`, `Route`)
@@ -57,40 +48,8 @@ La app incluye las siguientes pantallas:
 - **Google Maps Compose** (maps-compose 4.3)
 - **Coroutines + StateFlow** (asincronía reactiva)
 
-## Estructura del Proyecto
 
-```
-app/src/main/java/com/osornofoodroutes/
-├── data/                           # Capa de Datos
-│   ├── local/
-│   │   ├── AppDatabase.kt         # Room DB (Singleton)
-│   │   ├── FoodPlaceSeeder.kt     # Datos pre-cargados
-│   │   ├── Mappers.kt             # Entity ↔ Domain mapping
-│   │   ├── dao/                   # Data Access Objects
-│   │   └── entity/                # Room Entities
-│   └── repository/                # Implementaciones de repositorios
-├── domain/                        # Capa de Dominio
-│   ├── model/                     # Modelos de negocio
-│   ├── repository/                # Interfaces de repositorios
-│   └── usecase/                   # Casos de uso
-│       ├── auth/                  # Login, Register
-│       ├── foodplace/             # CRUD locales
-│       └── route/                 # CRUD rutas
-├── presentation/                  # Capa de Presentación
-│   ├── theme/                     # Colores, tipografía, tema
-│   ├── viewmodel/                 # ViewModels (MVVM)
-│   ├── navigation/                # Navegación
-│   ├── ui/
-│   │   ├── auth/                  # Login, Register
-│   │   ├── home/                  # Dashboard
-│   │   ├── foodplace/             # Lista y formulario de locales
-│   │   ├── route/                 # Lista y creación de rutas
-│   │   └── map/                   # Mapa MapLibre
-│   └── MainActivity.kt           # Punto de entrada
-└── OsornoFoodRoutesApp.kt        # Application class
-```
-
-## 🚀 Configuración
+## Configuración
 
 ### 1. Clonar el repositorio
 ```bash
