@@ -15,6 +15,25 @@ La app incluye las siguientes pantallas:
 
 ### Clean Architecture (3 Capas)
 
+El proyecto implementa de forma estricta la **Clean Architecture** separando el código en 3 capas fundamentales, asegurando escalabilidad y mantenibilidad:
+
+1. **Presentation (Capa de Presentación)**: 
+   - Contiene la interfaz de usuario desarrollada con **Jetpack Compose** (`ui` / `theme`).
+   - Manejo de estado y eventos con **ViewModels** (`viewmodel`).
+   - Gestión de rutas y pantallas (`navigation`).
+
+2. **Domain (Capa de Dominio)**:
+   - Contiene la lógica de negocio central (independiente del framework de Android).
+   - Entidades puras y modelos de datos (`model`).
+   - Reglas de negocio a través de **Casos de Uso** (`usecase`).
+   - Interfaces o contratos de los repositorios (`repository`).
+
+3. **Data (Capa de Datos)**:
+   - Implementa las interfaces de dominio y decide de dónde obtener los datos.
+   - Acceso a base de datos local mediante **Room** (`local`).
+   - Acceso a datos externos y APIs (`remote`).
+   - Implementaciones concretas de los repositorios (`repository`).
+
 ### MVVM (Model-View-ViewModel)
 - **Model**: Entidades de dominio (`User`, `FoodPlace`, `Route`)
 - **View**: Composables (pantallas declarativas)
