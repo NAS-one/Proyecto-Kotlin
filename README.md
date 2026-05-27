@@ -14,7 +14,29 @@ La app incluye las siguientes pantallas:
 ## Arquitectura
 
 ### Clean Architecture (3 Capas)
+El proyecto implementa de forma estricta la **Clean Architecture** separando el código en 3 capas fundamentales, asegurando escalabilidad y mantenibilidad. Su estructura se ve así:
 
+```text
+com.osornofoodroutes
+│
+├── presentation/
+│   ├── ui/ (screens & components)
+│   ├── theme/
+│   ├── navigation/
+│   └── viewmodel/
+│
+├── domain/
+│   ├── model/
+│   ├── repository/
+│   └── usecase/
+│
+└── data/
+    ├── remote/
+    ├── local/
+    └── repository/
+```
+
+### Capas en Detalle:
 El proyecto implementa de forma estricta la **Clean Architecture** separando el código en 3 capas fundamentales, asegurando escalabilidad y mantenibilidad:
 
 1. **Presentation (Capa de Presentación)**: 
