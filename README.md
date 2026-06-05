@@ -118,6 +118,6 @@ La app incluye 12 locales de comida reales de Osorno:
 - Rincón Cervecero
 - Emporio Sureño
 
-## 👤 Javier Uribe, Nicolás Almuna
+## 👤 Nicolás Almuna
 
 Proyecto académico - Desarrollo de Aplicaciones Móviles con Kotlin
