@@ -282,6 +282,6 @@ La app incluye 11 locales de comida reales de Osorno pre-cargados via `FoodPlace
 
 ---
 
-## Nicolás Almuna, Javier Uribe
+## Nicolás Almuna
 
 Proyecto académico - Desarrollo de Aplicaciones Móviles con Kotlin
