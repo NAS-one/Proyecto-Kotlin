@@ -1,4 +1,4 @@
-import java.util.Properties // <--- 1. AGREGAMOS ESTE IMPORT AQUÍ ARRIBA
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -23,14 +23,14 @@ android {
         }
 
         // Leer API Key desde secrets.properties
-        val properties = Properties() // <--- 2. AHORA SE USA DIRECTAMENTE ASÍ
+        val properties = Properties()
         val secretsFile = project.rootProject.file("secrets.properties")
         if (secretsFile.exists()) {
-            properties.load(secretsFile.inputStream())
+            secretsFile.inputStream().use { properties.load(it) }
         } else {
             val defaultFile = project.rootProject.file("local.defaults.properties")
             if (defaultFile.exists()) {
-                properties.load(defaultFile.inputStream())
+                defaultFile.inputStream().use { properties.load(it) }
             }
         }
         buildConfigField("String", "ORS_API_KEY", "\"${properties.getProperty("ORS_API_KEY", "")}\"")

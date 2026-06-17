@@ -30,7 +30,7 @@ import com.osornofoodroutes.presentation.theme.*
 
 /**
  * Pantalla principal / Dashboard.
- * Muestra resumen de la app con accesos rápidos.
+ * Diseño elegante y minimalista con tonos tierra.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,28 +49,38 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(
-                            "¡Hola, ${user.name.split(" ").first()}! 👋",
+                            "Hola, ${user.name.split(" ").first()} 👋",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Charcoal
                         )
                         Text(
-                            "Explora Osorno",
+                            "Descubre Osorno",
                             style = MaterialTheme.typography.bodySmall,
-                            color = SubtleText
+                            color = Taupe
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.Logout, contentDescription = "Cerrar sesión")
+                    IconButton(
+                        onClick = onLogout,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(Cream)
+                    ) {
+                        Icon(
+                            Icons.Default.Logout,
+                            contentDescription = "Cerrar sesión",
+                            tint = WarmBrown
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CreamBackground
+                    containerColor = Ivory
                 )
             )
         },
-        containerColor = CreamBackground
+        containerColor = Ivory
     ) { padding ->
         Column(
             modifier = Modifier
@@ -84,52 +94,54 @@ fun HomeScreen(
             // Banner principal
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = OrangePrimary)
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Terracotta),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             Brush.horizontalGradient(
-                                colors = listOf(OrangePrimary, OrangeLight)
+                                colors = listOf(Terracotta, TerracottaLight)
                             )
                         )
-                        .padding(20.dp)
+                        .padding(24.dp)
                 ) {
                     Column {
                         Text(
                             "🍽️ Rutas Gastronómicas",
                             style = MaterialTheme.typography.titleLarge,
-                            color = White,
+                            color = PureWhite,
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            "Descubre los sabores de Osorno con rutas personalizadas por la ciudad",
+                            "Recorre los mejores sabores de Osorno con rutas personalizadas",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = White.copy(alpha = 0.9f)
+                            color = PureWhite.copy(alpha = 0.85f)
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = onNavigateToMap,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                contentColor = OrangePrimary
+                                containerColor = PureWhite,
+                                contentColor = Terracotta
                             ),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(14.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                         ) {
                             Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text("Ver Mapa", fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // Estadísticas rápidas
+            // Estadísticas
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -139,38 +151,38 @@ fun HomeScreen(
                     icon = Icons.Default.Restaurant,
                     value = "${foodPlaces.size}",
                     label = "Locales",
-                    color = OrangePrimary
+                    color = Terracotta
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Route,
                     value = "$routeCount",
                     label = "Mis Rutas",
-                    color = GreenAccent
+                    color = SageGreen
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Default.Category,
                     value = "${foodPlaces.map { it.category }.distinct().size}",
                     label = "Categorías",
-                    color = WarmGray
+                    color = GoldStar
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Accesos rápidos
             Text(
                 "Accesos Rápidos",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = DarkText
+                color = Charcoal
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 QuickActionCard(
                     modifier = Modifier.weight(1f),
@@ -188,7 +200,7 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Locales destacados
             if (foodPlaces.isNotEmpty()) {
@@ -196,12 +208,12 @@ fun HomeScreen(
                     "⭐ Locales Destacados",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = DarkText
+                    color = Charcoal
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     val topPlaces = foodPlaces.sortedByDescending { it.rating }.take(5)
                     items(topPlaces) { place ->
@@ -210,7 +222,7 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
         }
     }
 }
@@ -225,9 +237,9 @@ fun StatCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = PureWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier
@@ -237,9 +249,9 @@ fun StatCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(44.dp)
                     .clip(CircleShape)
-                    .background(color.copy(alpha = 0.15f)),
+                    .background(color.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -249,17 +261,17 @@ fun StatCard(
                     modifier = Modifier.size(22.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = DarkText
+                color = Charcoal
             )
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = SubtleText
+                color = Taupe
             )
         }
     }
@@ -275,32 +287,40 @@ fun QuickActionCard(
 ) {
     Card(
         modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = PureWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = OrangePrimary,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(TerracottaSoft),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = Terracotta,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = DarkText
+                color = Charcoal
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = SubtleText
+                color = Taupe
             )
         }
     }
@@ -310,9 +330,9 @@ fun QuickActionCard(
 fun FeaturedPlaceCard(place: FoodPlace) {
     Card(
         modifier = Modifier.width(200.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = PureWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -322,8 +342,12 @@ fun FeaturedPlaceCard(place: FoodPlace) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(OrangePrimary.copy(alpha = 0.1f)),
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(TerracottaSoft, Cream)
+                        )
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -341,33 +365,35 @@ fun FeaturedPlaceCard(place: FoodPlace) {
                     fontSize = 36.sp
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = place.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Charcoal
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.Star,
                     contentDescription = null,
-                    tint = OrangePrimary,
+                    tint = GoldStar,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${place.rating}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = SubtleText
+                    color = WarmBrown,
+                    fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = place.category,
                     style = MaterialTheme.typography.bodySmall,
-                    color = OrangePrimary
+                    color = Terracotta
                 )
             }
         }

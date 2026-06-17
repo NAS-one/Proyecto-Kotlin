@@ -28,7 +28,7 @@ import com.osornofoodroutes.presentation.viewmodel.AuthUiState
 
 /**
  * Pantalla de inicio de sesión.
- * Diseño minimalista e intuitivo.
+ * Diseño elegante y minimalista con tonos tierra.
  */
 @Composable
 fun LoginScreen(
@@ -44,64 +44,85 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(OrangePrimary, OrangeLight, CreamBackground)
-                )
-            )
+            .background(Ivory)
     ) {
+        // Fondo decorativo superior
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(340.dp)
+                .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Terracotta, TerracottaLight)
+                    )
+                )
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             // Logo / Título
             Text(
                 text = "🍽️",
-                fontSize = 64.sp,
+                fontSize = 56.sp,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Ruta de Comida Osorno",
+                text = "Osorno",
                 style = MaterialTheme.typography.headlineLarge,
-                color = White,
+                color = PureWhite,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                lineHeight = 34.sp
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Descubre los mejores locales de comida del sure",
+                text = "FOOD ROUTES",
+                style = MaterialTheme.typography.titleMedium,
+                color = PureWhite.copy(alpha = 0.85f),
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Center,
+                letterSpacing = 4.sp
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = "Descubre los sabores de la ciudad",
                 style = MaterialTheme.typography.bodyMedium,
-                color = White.copy(alpha = 0.9f),
+                color = PureWhite.copy(alpha = 0.75f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             // Card de Login
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = PureWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Iniciar Sesión",
+                        text = "Bienvenido",
                         style = MaterialTheme.typography.titleLarge,
-                        color = DarkText,
+                        color = Charcoal,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Inicia sesión para continuar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Taupe
+                    )
+                    Spacer(modifier = Modifier.height(28.dp))
 
                     // Email
                     OutlinedTextField(
@@ -109,12 +130,17 @@ fun LoginScreen(
                         onValueChange = { email = it; onClearError() },
                         label = { Text("Email") },
                         leadingIcon = {
-                            Icon(Icons.Default.Email, contentDescription = null)
+                            Icon(Icons.Default.Email, contentDescription = null, tint = Taupe)
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Terracotta,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = Terracotta
+                        )
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,14 +150,15 @@ fun LoginScreen(
                         onValueChange = { password = it; onClearError() },
                         label = { Text("Contraseña") },
                         leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = null)
+                            Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
                         },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
                                     if (passwordVisible) Icons.Default.Visibility
                                     else Icons.Default.VisibilityOff,
-                                    contentDescription = "Toggle password"
+                                    contentDescription = "Toggle password",
+                                    tint = Taupe
                                 )
                             }
                         },
@@ -139,8 +166,13 @@ fun LoginScreen(
                         else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Terracotta,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = Terracotta
+                        )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -148,46 +180,57 @@ fun LoginScreen(
                     AnimatedVisibility(visible = uiState.errorMessage != null) {
                         Text(
                             text = uiState.errorMessage ?: "",
-                            color = ErrorRed,
+                            color = ErrorCoral,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     // Botón Login
                     Button(
                         onClick = { onLogin(email, password) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
+                            .height(54.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Terracotta,
+                            contentColor = PureWhite
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                         enabled = !uiState.isLoading
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = White,
+                                color = PureWhite,
                                 strokeWidth = 2.dp
                             )
                         } else {
                             Text(
                                 "Ingresar",
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                letterSpacing = 1.sp
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     // Enlace a Registro
                     TextButton(onClick = onNavigateToRegister) {
                         Text(
-                            "¿No tienes cuenta? Regístrate",
-                            color = OrangePrimary,
+                            "¿No tienes cuenta? ",
+                            color = Taupe,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "Regístrate",
+                            color = Terracotta,
+                            fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

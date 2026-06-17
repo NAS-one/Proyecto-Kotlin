@@ -1,4 +1,4 @@
-# 🍽️ Rutas de comida Osorno
+# 🍽️ Osorno Food Routes
 
 Aplicación móvil Android desarrollada en **Kotlin** con **Jetpack Compose** para explorar rutas de locales de comida en la ciudad de **Osorno, Chile**.
 
@@ -9,7 +9,7 @@ La app incluye las siguientes pantallas:
 - **Home** → Dashboard con resumen de locales y rutas
 - **Locales de Comida** → CRUD completo con filtro por categoría
 - **Rutas** → Crear recorridos gastronómicos personalizados
-- **Mapa** → Google Maps con marcadores y polilíneas de rutas
+- **Mapa** → Mapa y rutas
 
 ## Arquitectura
 
@@ -37,7 +37,6 @@ com.osornofoodroutes
 ```
 
 ### Capas en Detalle:
-El proyecto implementa de forma estricta la **Clean Architecture** separando el código en 3 capas fundamentales, asegurando escalabilidad y mantenibilidad:
 
 1. **Presentation (Capa de Presentación)**: 
    - Contiene la interfaz de usuario desarrollada con **Jetpack Compose** (`ui` / `theme`).
@@ -77,7 +76,7 @@ El proyecto implementa de forma estricta la **Clean Architecture** separando el 
 | **S** - Single Responsibility | Cada clase (ViewModel, UseCase, Repository) tiene una sola responsabilidad |
 | **O** - Open/Closed | `FoodPlaceFormScreen` reutilizado para crear y editar sin modificación |
 | **L** - Liskov Substitution | Las implementaciones de repositorios son intercambiables |
-| **I** - Interface  | Interfaces separadas para `UserRepository`, `FoodPlaceRepository`, `RouteRepository` |
+| **I** - Interface Segregation | Interfaces separadas para `UserRepository`, `FoodPlaceRepository`, `RouteRepository` |
 | **D** - Dependency Inversion | Los UseCases dependen de interfaces, no de implementaciones concretas |
 
 ## Tecnologías
@@ -86,7 +85,7 @@ El proyecto implementa de forma estricta la **Clean Architecture** separando el 
 - **Jetpack Compose** (Material 3)
 - **Room Database** (persistencia local)
 - **Navigation Compose**
-- **Google Maps Compose** (maps-compose 4.3)
+- **MapLibre + API RoutesService**
 - **Coroutines + StateFlow** (asincronía reactiva)
 
 
@@ -118,6 +117,6 @@ La app incluye 12 locales de comida reales de Osorno:
 - Rincón Cervecero
 - Emporio Sureño
 
-## 👤 Nicolás Almuna
+## Nicolás Almuna, Javier Uribe
 
 Proyecto académico - Desarrollo de Aplicaciones Móviles con Kotlin
