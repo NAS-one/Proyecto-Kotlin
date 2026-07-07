@@ -1,8 +1,9 @@
 package com.osornofoodroutes.data.repository
 
-import com.osornofoodroutes.data.local.dao.UserDao
-import com.osornofoodroutes.data.local.toDomain
-import com.osornofoodroutes.data.local.toEntity
+import com.osornofoodroutes.data.remote.AuthApi
+import com.osornofoodroutes.data.remote.BackendApiClient
+import com.osornofoodroutes.data.remote.dto.LoginRequest
+import com.osornofoodroutes.data.remote.dto.RegisterRequest
 import com.osornofoodroutes.domain.model.User
 import com.osornofoodroutes.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
@@ -14,36 +15,55 @@ import kotlinx.coroutines.flow.map
  * Patrón Repository: Abstrae el acceso a la fuente de datos.
  */
 class UserRepositoryImpl(
-    private val userDao: UserDao
+    private val authApi: AuthApi
 ) : UserRepository {
 
     override suspend fun register(user: User): Long {
         return try {
-            userDao.insert(user.toEntity())
+            val response = authApi.register(
+                RegisterRequest(
+                    name = user.name,
+                    email = user.email,
+                    password = user.password
+                )
+            )
+            // Para simplificar, devolvemos 1 si es exitoso
+            if (response.success) 1L else -1L
         } catch (e: Exception) {
             -1L // Email duplicado u otro error
         }
     }
 
     override suspend fun login(email: String, password: String): User? {
-        return userDao.login(email, password)?.toDomain()
+        return try {
+            val response = authApi.login(LoginRequest(email, password))
+            // Guardar el token en el cliente para futuras peticiones
+            BackendApiClient.authToken = response.token
+            
+            User(
+                id = response.userId.toLong(),
+                name = response.name,
+                email = response.email,
+                password = ""
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override suspend fun getUserById(id: Long): User? {
-        return userDao.getUserById(id)?.toDomain()
+        return null // No implementado en backend
     }
 
     override suspend fun updateUser(user: User) {
-        userDao.update(user.toEntity())
+        // No implementado en backend
     }
 
     override suspend fun deleteUser(user: User) {
-        userDao.delete(user.toEntity())
+        // No implementado en backend
     }
 
     override fun getAllUsers(): Flow<List<User>> {
-        return userDao.getAllUsers().map { list ->
-            list.map { it.toDomain() }
-        }
+        return kotlinx.coroutines.flow.emptyFlow() // No implementado en backend
     }
 }

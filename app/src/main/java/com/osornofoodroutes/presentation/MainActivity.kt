@@ -41,13 +41,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // === CONFIGURACIÓN DE DEPENDENCIAS (Manual DI) ===
-        val app = application as OsornoFoodRoutesApp
-        val database = app.database
+        // Se cambió Room local por cliente Retrofit conectado a la base de datos de Neon
+        val authApi = com.osornofoodroutes.data.remote.BackendApiClient.authApi
+        val foodPlaceApi = com.osornofoodroutes.data.remote.BackendApiClient.foodPlaceApi
+        val routeApi = com.osornofoodroutes.data.remote.BackendApiClient.routeApi
 
         // Repositorios (Implementaciones concretas)
-        val userRepository = UserRepositoryImpl(database.userDao())
-        val foodPlaceRepository = FoodPlaceRepositoryImpl(database.foodPlaceDao())
-        val routeRepository = RouteRepositoryImpl(database.routeDao())
+        val userRepository = UserRepositoryImpl(authApi)
+        val foodPlaceRepository = FoodPlaceRepositoryImpl(foodPlaceApi)
+        val routeRepository = RouteRepositoryImpl(routeApi)
 
         // Use Cases - Auth
         val loginUseCase = LoginUseCase(userRepository)
