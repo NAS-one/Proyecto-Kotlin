@@ -104,6 +104,13 @@ fun AppNavigation(
                         }
                     }
                 )
+            } else {
+                // Seguridad: redirigir a login si no hay usuario autenticado
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             }
         }
 
@@ -182,6 +189,13 @@ fun AppNavigation(
                     },
                     onBack = { navController.popBackStack() }
                 )
+            } else {
+                // Seguridad: redirigir a login si no hay usuario autenticado
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             }
         }
 

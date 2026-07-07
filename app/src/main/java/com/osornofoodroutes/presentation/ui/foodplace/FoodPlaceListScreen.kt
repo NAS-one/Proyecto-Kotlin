@@ -1,8 +1,7 @@
 package com.osornofoodroutes.presentation.ui.foodplace
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osornofoodroutes.domain.model.FoodPlace
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.home.getCategoryEmoji
 import com.osornofoodroutes.presentation.viewmodel.FoodPlaceUiState
 
 /**
@@ -46,32 +46,41 @@ fun FoodPlaceListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Locales de Comida",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        Text(
+                            "Locales de Comida",
+                            fontWeight = FontWeight.Bold,
+                            color = Charcoal
+                        )
+                        Text(
+                            "${uiState.foodPlaces.size} locales registrados",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Taupe
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Charcoal)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CreamBackground
+                    containerColor = Ivory
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddPlace,
-                containerColor = OrangePrimary,
-                contentColor = White,
-                shape = RoundedCornerShape(16.dp)
+                containerColor = Terracotta,
+                contentColor = PureWhite,
+                shape = RoundedCornerShape(16.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Agregar local")
             }
         },
-        containerColor = CreamBackground
+        containerColor = Ivory
     ) { padding ->
         Column(
             modifier = Modifier
@@ -82,7 +91,7 @@ fun FoodPlaceListScreen(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categories) { category ->
@@ -92,12 +101,19 @@ fun FoodPlaceListScreen(
                         label = {
                             Text(
                                 category,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = if (uiState.selectedCategory == category) FontWeight.SemiBold else FontWeight.Normal
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = OrangePrimary,
-                            selectedLabelColor = White
+                            selectedContainerColor = Terracotta,
+                            selectedLabelColor = PureWhite,
+                            containerColor = PureWhite,
+                            labelColor = WarmBrown
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = Sand,
+                            selectedBorderColor = Terracotta
                         ),
                         shape = RoundedCornerShape(20.dp)
                     )
@@ -110,7 +126,7 @@ fun FoodPlaceListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = OrangePrimary)
+                    CircularProgressIndicator(color = Terracotta)
                 }
             } else if (filteredPlaces.isEmpty()) {
                 Box(
@@ -118,19 +134,34 @@ fun FoodPlaceListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("🍽️", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(TerracottaSoft),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("🍽️", fontSize = 36.sp)
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "No hay locales en esta categoría",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = SubtleText
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Charcoal,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "Prueba con otra categoría o agrega uno nuevo",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Taupe
                         )
                     }
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredPlaces) { place ->
@@ -151,23 +182,37 @@ fun FoodPlaceListScreen(
     placeToDelete?.let { place ->
         AlertDialog(
             onDismissRequest = { placeToDelete = null },
-            title = { Text("Eliminar Local") },
-            text = { Text("¿Estás seguro de eliminar \"${place.name}\"?") },
+            title = {
+                Text("Eliminar Local", fontWeight = FontWeight.SemiBold)
+            },
+            text = {
+                Text("¿Estás seguro de eliminar \"${place.name}\"? Esta acción no se puede deshacer.")
+            },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         onDeletePlace(place)
                         placeToDelete = null
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ErrorCoral,
+                        contentColor = PureWhite
+                    ),
+                    shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Eliminar", color = ErrorRed)
+                    Text("Eliminar")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { placeToDelete = null }) {
+                OutlinedButton(
+                    onClick = { placeToDelete = null },
+                    shape = RoundedCornerShape(10.dp),
+                    border = ButtonDefaults.outlinedButtonBorder
+                ) {
                     Text("Cancelar")
                 }
-            }
+            },
+            shape = RoundedCornerShape(20.dp)
         )
     }
 }
@@ -180,10 +225,12 @@ fun FoodPlaceCard(
     onViewOnMap: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = PureWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier
@@ -198,22 +245,12 @@ fun FoodPlaceCard(
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(OrangePrimary.copy(alpha = 0.1f)),
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(TerracottaSoft),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = when (place.category) {
-                            "Restaurante" -> "🍖"
-                            "Café" -> "☕"
-                            "Pastelería" -> "🍰"
-                            "Comida Rápida" -> "🍔"
-                            "Mercado" -> "🏪"
-                            "Bar" -> "🍺"
-                            "Cocina Casera" -> "🍲"
-                            "Emporio" -> "🧀"
-                            else -> "🍽️"
-                        },
+                        text = getCategoryEmoji(place.category),
                         fontSize = 28.sp
                     )
                 }
@@ -226,33 +263,34 @@ fun FoodPlaceCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = Charcoal
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.Star,
                             contentDescription = null,
-                            tint = OrangePrimary,
+                            tint = GoldStar,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "${place.rating}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = OrangePrimary,
+                            color = WarmBrown,
                             fontWeight = FontWeight.Medium
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = GreenAccent.copy(alpha = 0.1f)
+                            color = SageGreen.copy(alpha = 0.1f)
                         ) {
                             Text(
                                 text = place.category,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = GreenAccent,
+                                color = SageGreen,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 fontWeight = FontWeight.Medium
                             )
@@ -261,30 +299,31 @@ fun FoodPlaceCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = place.description,
                 style = MaterialTheme.typography.bodySmall,
-                color = SubtleText,
+                color = Taupe,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 18.sp
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.LocationOn,
                     contentDescription = null,
-                    tint = SubtleText,
+                    tint = Taupe,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = place.address,
                     style = MaterialTheme.typography.bodySmall,
-                    color = SubtleText,
+                    color = Taupe,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -296,19 +335,22 @@ fun FoodPlaceCard(
                     Icon(
                         Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = SubtleText,
+                        tint = Taupe,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = place.openingHours,
                         style = MaterialTheme.typography.bodySmall,
-                        color = SubtleText
+                        color = Taupe
                     )
                 }
             }
 
+            // Divider sutil entre contenido y acciones
             Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = Sand, thickness = 0.5.dp)
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Acciones
             Row(
@@ -316,27 +358,37 @@ fun FoodPlaceCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onViewOnMap) {
-                    Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.Map,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = SageGreen
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Mapa", style = MaterialTheme.typography.bodySmall)
+                    Text("Mapa", style = MaterialTheme.typography.bodySmall, color = SageGreen)
                 }
                 TextButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Terracotta
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Editar", style = MaterialTheme.typography.bodySmall)
+                    Text("Editar", style = MaterialTheme.typography.bodySmall, color = Terracotta)
                 }
                 TextButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        tint = ErrorRed
+                        tint = ErrorCoral
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         "Eliminar",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ErrorRed
+                        color = ErrorCoral
                     )
                 }
             }

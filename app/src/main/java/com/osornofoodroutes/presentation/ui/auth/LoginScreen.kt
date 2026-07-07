@@ -1,9 +1,12 @@
 package com.osornofoodroutes.presentation.ui.auth
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -15,8 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -40,6 +46,12 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var localError by remember { mutableStateOf<String?>(null) }
+    val focusManager = LocalFocusManager.current
+
+    // Animación de aparición
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
 
     Box(
         modifier = Modifier
@@ -98,141 +110,183 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // Card de Login
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = PureWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+            // Card de Login con animación
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = PureWhite),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
                 ) {
-                    Text(
-                        text = "Bienvenido",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Charcoal,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = "Inicia sesión para continuar",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Taupe
-                    )
-                    Spacer(modifier = Modifier.height(28.dp))
-
-                    // Email
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it; onClearError() },
-                        label = { Text("Email") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Email, contentDescription = null, tint = Taupe)
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Terracotta,
-                            unfocusedBorderColor = Sand,
-                            focusedLabelColor = Terracotta
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Contraseña
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it; onClearError() },
-                        label = { Text("Contraseña") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    if (passwordVisible) Icons.Default.Visibility
-                                    else Icons.Default.VisibilityOff,
-                                    contentDescription = "Toggle password",
-                                    tint = Taupe
-                                )
-                            }
-                        },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Terracotta,
-                            unfocusedBorderColor = Sand,
-                            focusedLabelColor = Terracotta
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Error
-                    AnimatedVisibility(visible = uiState.errorMessage != null) {
-                        Text(
-                            text = uiState.errorMessage ?: "",
-                            color = ErrorCoral,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Botón Login
-                    Button(
-                        onClick = { onLogin(email, password) },
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Terracotta,
-                            contentColor = PureWhite
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        enabled = !uiState.isLoading
+                            .padding(28.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = PureWhite,
-                                strokeWidth = 2.dp
+                        Text(
+                            text = "Bienvenido",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Charcoal,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Inicia sesión para continuar",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Taupe
+                        )
+                        Spacer(modifier = Modifier.height(28.dp))
+
+                        // Email
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { email = it; onClearError(); localError = null },
+                            label = { Text("Email") },
+                            leadingIcon = {
+                                Icon(Icons.Default.Email, contentDescription = null, tint = Taupe)
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Terracotta,
+                                unfocusedBorderColor = Sand,
+                                focusedLabelColor = Terracotta,
+                                cursorColor = Terracotta
                             )
-                        } else {
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Contraseña
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it; onClearError(); localError = null },
+                            label = { Text("Contraseña") },
+                            leadingIcon = {
+                                Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        if (passwordVisible) Icons.Default.Visibility
+                                        else Icons.Default.VisibilityOff,
+                                        contentDescription = "Toggle password",
+                                        tint = Taupe
+                                    )
+                                }
+                            },
+                            visualTransformation = if (passwordVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                    if (email.isBlank() || password.isBlank()) {
+                                        localError = "Completa todos los campos"
+                                    } else {
+                                        onLogin(email.trim(), password)
+                                    }
+                                }
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Terracotta,
+                                unfocusedBorderColor = Sand,
+                                focusedLabelColor = Terracotta,
+                                cursorColor = Terracotta
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Error
+                        AnimatedVisibility(visible = uiState.errorMessage != null || localError != null) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = ErrorCoral.copy(alpha = 0.1f),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = localError ?: uiState.errorMessage ?: "",
+                                    color = ErrorCoral,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Botón Login
+                        Button(
+                            onClick = {
+                                focusManager.clearFocus()
+                                if (email.isBlank() || password.isBlank()) {
+                                    localError = "Completa todos los campos"
+                                } else {
+                                    localError = null
+                                    onLogin(email.trim(), password)
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Terracotta,
+                                contentColor = PureWhite
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                            enabled = !uiState.isLoading
+                        ) {
+                            if (uiState.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = PureWhite,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    "Ingresar",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 1.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Enlace a Registro
+                        TextButton(onClick = onNavigateToRegister) {
                             Text(
-                                "Ingresar",
-                                fontSize = 16.sp,
+                                "¿No tienes cuenta? ",
+                                color = Taupe,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                "Regístrate",
+                                color = Terracotta,
                                 fontWeight = FontWeight.SemiBold,
-                                letterSpacing = 1.sp
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Enlace a Registro
-                    TextButton(onClick = onNavigateToRegister) {
-                        Text(
-                            "¿No tienes cuenta? ",
-                            color = Taupe,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            "Regístrate",
-                            color = Terracotta,
-                            fontWeight = FontWeight.SemiBold,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
                     }
                 }
             }

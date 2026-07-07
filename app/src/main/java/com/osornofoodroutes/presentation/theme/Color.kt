@@ -28,7 +28,9 @@ val Taupe = Color(0xFF8C7B6B)               // Texto sutil
 
 // Utilidad
 val PureWhite = Color(0xFFFFFFFF)
+val WarmWhite = Color(0xFFFFFBF7)            // Blanco cálido para superficies premium
 val SoftBlack = Color(0xFF1A1714)
+val DarkOverlay = Color(0x33000000)          // Overlay oscuro para gradientes
 val ErrorCoral = Color(0xFFD45B4E)           // Error (coral suave)
 val SuccessGreen = Color(0xFF5A9E5F)         // Éxito
 val GoldStar = Color(0xFFD4A84B)             // Estrellas/rating

@@ -2,13 +2,15 @@
 
 Aplicación móvil Android desarrollada en **Kotlin** con **Jetpack Compose** para explorar rutas de locales de comida en la ciudad de **Osorno, Chile**. Incluye un **backend propio** desarrollado con **Ktor** conectado a una base de datos **PostgreSQL en Neon**.
 
+La aplicación cuenta con un **diseño moderno, elegante y minimalista** basado en una paleta de colores cálidos (Terracotta, Sage Green, Ivory), incorporando micro-animaciones, sombras dinámicas y estados vacíos refinados para una experiencia de usuario (UX) de nivel profesional.
+
 ## Pantallas de la App
 
-- **Login / Registro** → Autenticación de usuarios con JWT
-- **Home** → Dashboard con resumen de locales y rutas
-- **Locales de Comida** → CRUD completo con filtro por categoría
-- **Rutas** → Crear recorridos gastronómicos personalizados
-- **Mapa** → Visualización con MapLibre y trazado de rutas
+- **Login / Registro** → Autenticación de usuarios con validaciones de campos y diseño unificado.
+- **Home** → Dashboard con resumen de locales, tarjetas dinámicas y accesos rápidos.
+- **Locales de Comida** → CRUD completo con filtro por categorías, chips estilizados y diálogos de confirmación seguros.
+- **Rutas** → Crear recorridos gastronómicos con selección animada de locales e indicadores numerados de paradas.
+- **Mapa** → Visualización fluida con gestión de ciclo de vida (anti memory-leaks), tarjetas premium flotantes y trazado real de rutas con OpenRouteService.
 
 ---
 

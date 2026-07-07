@@ -1,9 +1,11 @@
 package com.osornofoodroutes.presentation.ui.route
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -40,29 +42,37 @@ fun RouteListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Mis Rutas", fontWeight = FontWeight.Bold)
+                    Column {
+                        Text("Mis Rutas", fontWeight = FontWeight.Bold, color = Charcoal)
+                        Text(
+                            "${uiState.routes.size} rutas creadas",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Taupe
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Charcoal)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CreamBackground
+                    containerColor = Ivory
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateRoute,
-                containerColor = GreenAccent,
-                contentColor = White,
-                shape = RoundedCornerShape(16.dp)
+                containerColor = SageGreen,
+                contentColor = PureWhite,
+                shape = RoundedCornerShape(16.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Crear ruta")
             }
         },
-        containerColor = CreamBackground
+        containerColor = Ivory
     ) { padding ->
         if (uiState.isLoading) {
             Box(
@@ -71,7 +81,7 @@ fun RouteListScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = OrangePrimary)
+                CircularProgressIndicator(color = SageGreen)
             }
         } else if (uiState.routes.isEmpty()) {
             Box(
@@ -81,28 +91,41 @@ fun RouteListScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🗺️", fontSize = 64.sp)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .background(SageGreenLight.copy(alpha = 0.4f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🗺️", fontSize = 36.sp)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         "No tienes rutas creadas",
                         style = MaterialTheme.typography.titleMedium,
-                        color = DarkText
+                        color = Charcoal,
+                        fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "Crea tu primera ruta gastronómica",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = SubtleText
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Taupe
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     Button(
                         onClick = onCreateRoute,
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SageGreen,
+                            contentColor = PureWhite
+                        ),
+                        shape = RoundedCornerShape(14.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = null)
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Crear Ruta")
+                        Text("Crear Ruta", fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -111,7 +134,7 @@ fun RouteListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(uiState.routes) { route ->
@@ -131,21 +154,36 @@ fun RouteListScreen(
     routeToDelete?.let { route ->
         AlertDialog(
             onDismissRequest = { routeToDelete = null },
-            title = { Text("Eliminar Ruta") },
-            text = { Text("¿Eliminar la ruta \"${route.name}\"?") },
+            title = {
+                Text("Eliminar Ruta", fontWeight = FontWeight.SemiBold)
+            },
+            text = {
+                Text("¿Eliminar la ruta \"${route.name}\"? Esta acción no se puede deshacer.")
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    onDeleteRoute(route)
-                    routeToDelete = null
-                }) {
-                    Text("Eliminar", color = ErrorRed)
+                Button(
+                    onClick = {
+                        onDeleteRoute(route)
+                        routeToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ErrorCoral,
+                        contentColor = PureWhite
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Eliminar")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { routeToDelete = null }) {
+                OutlinedButton(
+                    onClick = { routeToDelete = null },
+                    shape = RoundedCornerShape(10.dp)
+                ) {
                     Text("Cancelar")
                 }
-            }
+            },
+            shape = RoundedCornerShape(20.dp)
         )
     }
 }
@@ -158,10 +196,12 @@ fun RouteCard(
     onDelete: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = PureWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier
@@ -175,15 +215,15 @@ fun RouteCard(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(GreenAccent.copy(alpha = 0.1f)),
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(SageGreen.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Route,
                         contentDescription = null,
-                        tint = GreenAccent,
-                        modifier = Modifier.size(28.dp)
+                        tint = SageGreen,
+                        modifier = Modifier.size(26.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -191,71 +231,121 @@ fun RouteCard(
                     Text(
                         text = route.name,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        color = Charcoal
                     )
-                    Text(
-                        text = "${route.foodPlaceIds.size} locales · ${route.estimatedTime}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = SubtleText
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = SageGreen.copy(alpha = 0.1f)
+                        ) {
+                            Text(
+                                text = "${route.foodPlaceIds.size} locales",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = SageGreen,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        if (route.estimatedTime.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "· ${route.estimatedTime}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Taupe
+                            )
+                        }
+                    }
                 }
             }
 
             if (route.description.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = route.description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = SubtleText,
+                    color = Taupe,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
                 )
             }
 
-            // Locales en la ruta
+            // Locales en la ruta con indicador numérico
             if (foodPlaces.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                foodPlaces.take(3).forEach { place ->
-                    Row(
-                        modifier = Modifier.padding(vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("📍", fontSize = 12.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = place.name,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = DarkText,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                Spacer(modifier = Modifier.height(12.dp))
+                foodPlaces.forEachIndexed { index, place ->
+                    if (index < 3) {
+                        Row(
+                            modifier = Modifier.padding(vertical = 3.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Número de parada
+                            Box(
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .clip(CircleShape)
+                                    .background(Terracotta.copy(alpha = 0.12f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${index + 1}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Terracotta,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = place.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Charcoal,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
                 if (foodPlaces.size > 3) {
                     Text(
                         text = "+${foodPlaces.size - 3} más",
                         style = MaterialTheme.typography.bodySmall,
-                        color = OrangePrimary,
-                        modifier = Modifier.padding(start = 22.dp)
+                        color = Terracotta,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 30.dp, top = 2.dp)
                     )
                 }
             }
 
+            // Divider sutil
             Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = Sand, thickness = 0.5.dp)
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onViewOnMap) {
-                    Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.Map,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = SageGreen
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Ver en Mapa")
+                    Text("Ver en Mapa", color = SageGreen, style = MaterialTheme.typography.bodySmall)
                 }
                 TextButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp), tint = ErrorRed)
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = ErrorCoral
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Eliminar", color = ErrorRed)
+                    Text("Eliminar", color = ErrorCoral, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

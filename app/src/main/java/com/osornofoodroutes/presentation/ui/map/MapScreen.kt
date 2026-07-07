@@ -1,7 +1,9 @@
 package com.osornofoodroutes.presentation.ui.map
 
 import android.graphics.Color as AndroidColor
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -9,16 +11,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
-import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.annotations.PolylineOptions
@@ -26,6 +32,7 @@ import com.osornofoodroutes.BuildConfig
 import com.osornofoodroutes.domain.model.FoodPlace
 import com.osornofoodroutes.data.remote.RetrofitClient
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.home.getCategoryEmoji
 import kotlinx.coroutines.launch
 import android.util.Log
 
@@ -100,6 +107,29 @@ fun MapScreen(
     val context = LocalContext.current
     remember { MapLibre.getInstance(context) }
 
+    // FIX: Gestión correcta del ciclo de vida del MapView
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val mapViewRef = remember { mutableStateOf<MapView?>(null) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            val mapView = mapViewRef.value ?: return@LifecycleEventObserver
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            mapViewRef.value?.onDestroy()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -107,22 +137,23 @@ fun MapScreen(
                     Column {
                         Text(
                             if (routePlaces != null) "Ruta en Mapa" else "Mapa de Osorno",
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Charcoal
                         )
                         Text(
                             "${placesToShow.size} locales",
                             style = MaterialTheme.typography.bodySmall,
-                            color = SubtleText
+                            color = Taupe
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Charcoal)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CreamBackground
+                    containerColor = Ivory
                 )
             )
         }
@@ -137,6 +168,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
                     MapView(ctx).apply {
+                        mapViewRef.value = this
                         getMapAsync { map ->
                             // Configurar estilo del mapa
                             map.setStyle(Style.Builder().fromUri(mapStyleUrl)) { style ->
@@ -188,7 +220,7 @@ fun MapScreen(
                                 map.addPolyline(
                                     PolylineOptions()
                                         .addAll(points)
-                                        .color(AndroidColor.parseColor("#E8734A")) // OrangePrimary
+                                        .color(AndroidColor.parseColor("#CC5A3A")) // Terracotta
                                         .width(5f)
                                 )
                             }
@@ -197,140 +229,159 @@ fun MapScreen(
                 }
             )
 
-            // Tarjeta del local seleccionado
+            // Tarjeta del local seleccionado — diseño premium
             selectedPlace?.let { place ->
                 Card(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .padding(16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    shape = RoundedCornerShape(22.dp),
+                    colors = CardDefaults.cardColors(containerColor = PureWhite),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(18.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.Top
                         ) {
+                            // Emoji de categoría
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(TerracottaSoft),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = getCategoryEmoji(place.category),
+                                    fontSize = 22.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = place.name,
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = Charcoal
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         Icons.Default.Star,
                                         contentDescription = null,
-                                        tint = OrangePrimary,
+                                        tint = GoldStar,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         "${place.rating}",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = OrangePrimary,
+                                        color = WarmBrown,
                                         fontWeight = FontWeight.Medium
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
-                                        color = GreenAccent.copy(alpha = 0.1f)
+                                        color = SageGreen.copy(alpha = 0.1f)
                                     ) {
                                         Text(
                                             place.category,
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = GreenAccent,
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                            color = SageGreen,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                            fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }
                             }
-                            IconButton(onClick = { selectedPlace = null }) {
-                                Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                            IconButton(
+                                onClick = { selectedPlace = null },
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(Cream)
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Cerrar",
+                                    modifier = Modifier.size(18.dp),
+                                    tint = WarmBrown
+                                )
                             }
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Divider(color = Sand, thickness = 0.5.dp)
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Text(
                             text = place.description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = SubtleText,
+                            color = Taupe,
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 18.sp
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = SubtleText, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = Taupe, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(place.address, style = MaterialTheme.typography.bodySmall, color = SubtleText)
+                            Text(place.address, style = MaterialTheme.typography.bodySmall, color = Taupe)
                         }
                         if (place.phone.isNotBlank()) {
                             Spacer(modifier = Modifier.height(2.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Phone, contentDescription = null, tint = SubtleText, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Phone, contentDescription = null, tint = Taupe, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(place.phone, style = MaterialTheme.typography.bodySmall, color = SubtleText)
+                                Text(place.phone, style = MaterialTheme.typography.bodySmall, color = Taupe)
                             }
                         }
                         if (place.openingHours.isNotBlank()) {
                             Spacer(modifier = Modifier.height(2.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Schedule, contentDescription = null, tint = SubtleText, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Schedule, contentDescription = null, tint = Taupe, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(place.openingHours, style = MaterialTheme.typography.bodySmall, color = SubtleText)
+                                Text(place.openingHours, style = MaterialTheme.typography.bodySmall, color = Taupe)
                             }
                         }
                     }
                 }
             }
 
-            // Leyenda de colores
+            // Leyenda de categorías — diseño compacto
             Card(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = White.copy(alpha = 0.95f)),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = PureWhite.copy(alpha = 0.96f)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     Text(
                         "Categorías",
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        color = Charcoal
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     LegendItem("🍖 Restaurante")
                     LegendItem("☕ Café")
                     LegendItem("🍰 Pastelería")
                     LegendItem("🍔 Comida Rápida")
                     LegendItem("🏪 Mercado")
+                    LegendItem("🍺 Bar")
+                    LegendItem("🍲 Cocina Casera")
+                    LegendItem("🧀 Emporio")
                 }
             }
         }
-    }
-}
-
-/**
- * Retorna un color Android según la categoría del local.
- */
-private fun getCategoryColor(category: String): Int {
-    return when (category) {
-        "Restaurante" -> AndroidColor.parseColor("#E53935")   // Rojo
-        "Café" -> AndroidColor.parseColor("#FF9800")          // Naranja
-        "Pastelería" -> AndroidColor.parseColor("#E91E63")    // Rosa
-        "Comida Rápida" -> AndroidColor.parseColor("#FFC107") // Amarillo
-        "Mercado" -> AndroidColor.parseColor("#4CAF50")       // Verde
-        "Bar" -> AndroidColor.parseColor("#9C27B0")           // Violeta
-        "Cocina Casera" -> AndroidColor.parseColor("#00BCD4") // Cyan
-        "Emporio" -> AndroidColor.parseColor("#2196F3")       // Azul
-        else -> AndroidColor.parseColor("#E53935")            // Rojo por defecto
     }
 }
 
@@ -339,6 +390,8 @@ private fun LegendItem(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(vertical = 1.dp)
+        color = WarmBrown,
+        modifier = Modifier.padding(vertical = 1.dp),
+        fontSize = 11.sp
     )
 }

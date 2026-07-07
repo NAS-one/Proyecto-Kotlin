@@ -1,5 +1,6 @@
 package com.osornofoodroutes.presentation.ui.home
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -47,18 +48,40 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            "Hola, ${user.name.split(" ").first()} 👋",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Charcoal
-                        )
-                        Text(
-                            "Descubre Osorno",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Taupe
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Avatar con inicial del usuario
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Terracotta, TerracottaLight)
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = user.name.first().uppercase(),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = PureWhite
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Column {
+                            Text(
+                                "Hola, ${user.name.split(" ").first()} 👋",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Charcoal
+                            )
+                            Text(
+                                "Descubre Osorno",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Taupe
+                            )
+                        }
                     }
                 },
                 actions = {
@@ -91,37 +114,47 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Banner principal
+            // Banner principal mejorado
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Terracotta),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             Brush.horizontalGradient(
-                                colors = listOf(Terracotta, TerracottaLight)
+                                colors = listOf(Terracotta, TerracottaLight, TerracottaDark.copy(alpha = 0.8f))
                             )
                         )
                         .padding(24.dp)
                 ) {
                     Column {
-                        Text(
-                            "🍽️ Rutas Gastronómicas",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = PureWhite,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "🍽️",
+                                fontSize = 28.sp
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                "Rutas Gastronómicas",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = PureWhite,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "Recorre los mejores sabores de Osorno con rutas personalizadas",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = PureWhite.copy(alpha = 0.85f)
+                            color = PureWhite.copy(alpha = 0.9f),
+                            lineHeight = 22.sp
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
                         Button(
                             onClick = onNavigateToMap,
                             colors = ButtonDefaults.buttonColors(
@@ -133,7 +166,7 @@ fun HomeScreen(
                         ) {
                             Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Ver Mapa", fontWeight = FontWeight.SemiBold)
+                            Text("Explorar Mapa", fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -189,6 +222,8 @@ fun HomeScreen(
                     icon = Icons.Outlined.RestaurantMenu,
                     title = "Locales",
                     subtitle = "Ver y gestionar",
+                    accentColor = Terracotta,
+                    backgroundColor = TerracottaSoft,
                     onClick = onNavigateToPlaces
                 )
                 QuickActionCard(
@@ -196,6 +231,8 @@ fun HomeScreen(
                     icon = Icons.Outlined.Explore,
                     title = "Mis Rutas",
                     subtitle = "Crear recorridos",
+                    accentColor = SageGreen,
+                    backgroundColor = SageGreenLight.copy(alpha = 0.4f),
                     onClick = onNavigateToRoutes
                 )
             }
@@ -204,13 +241,27 @@ fun HomeScreen(
 
             // Locales destacados
             if (foodPlaces.isNotEmpty()) {
-                Text(
-                    "⭐ Locales Destacados",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Charcoal
-                )
-                Spacer(modifier = Modifier.height(14.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "⭐ Locales Destacados",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Charcoal,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = onNavigateToPlaces) {
+                        Text(
+                            "Ver todos",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Terracotta,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
 
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(14.dp)
@@ -236,7 +287,7 @@ fun StatCard(
     color: androidx.compose.ui.graphics.Color
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.animateContentSize(),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = PureWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
@@ -283,6 +334,8 @@ fun QuickActionCard(
     icon: ImageVector,
     title: String,
     subtitle: String,
+    accentColor: androidx.compose.ui.graphics.Color = Terracotta,
+    backgroundColor: androidx.compose.ui.graphics.Color = TerracottaSoft,
     onClick: () -> Unit
 ) {
     Card(
@@ -300,13 +353,13 @@ fun QuickActionCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(TerracottaSoft),
+                    .background(backgroundColor),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = Terracotta,
+                    tint = accentColor,
                     modifier = Modifier.size(26.dp)
                 )
             }
@@ -329,10 +382,12 @@ fun QuickActionCard(
 @Composable
 fun FeaturedPlaceCard(place: FoodPlace) {
     Card(
-        modifier = Modifier.width(200.dp),
+        modifier = Modifier
+            .width(200.dp)
+            .animateContentSize(),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = PureWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -351,17 +406,7 @@ fun FeaturedPlaceCard(place: FoodPlace) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = when (place.category) {
-                        "Restaurante" -> "🍖"
-                        "Café" -> "☕"
-                        "Pastelería" -> "🍰"
-                        "Comida Rápida" -> "🍔"
-                        "Mercado" -> "🏪"
-                        "Bar" -> "🍺"
-                        "Cocina Casera" -> "🍲"
-                        "Emporio" -> "🧀"
-                        else -> "🍽️"
-                    },
+                    text = getCategoryEmoji(place.category),
                     fontSize = 36.sp
                 )
             }
@@ -390,12 +435,36 @@ fun FeaturedPlaceCard(place: FoodPlace) {
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = place.category,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Terracotta
-                )
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = SageGreen.copy(alpha = 0.1f)
+                ) {
+                    Text(
+                        text = place.category,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = SageGreen,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        fontSize = 10.sp
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * Retorna el emoji correspondiente a la categoría del local.
+ */
+fun getCategoryEmoji(category: String): String {
+    return when (category) {
+        "Restaurante" -> "🍖"
+        "Café" -> "☕"
+        "Pastelería" -> "🍰"
+        "Comida Rápida" -> "🍔"
+        "Mercado" -> "🏪"
+        "Bar" -> "🍺"
+        "Cocina Casera" -> "🍲"
+        "Emporio" -> "🧀"
+        else -> "🍽️"
     }
 }
