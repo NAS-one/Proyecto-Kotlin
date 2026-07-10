@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.components.LoadingSpinner
 import com.osornofoodroutes.presentation.viewmodel.AuthUiState
 
 /**
@@ -49,9 +50,7 @@ fun LoginScreen(
     var localError by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
 
-    // Animación de aparición
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { visible = true }
+    // Animación eliminada por estabilidad
 
     Box(
         modifier = Modifier
@@ -110,12 +109,8 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // Card de Login con animación
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
-            ) {
-                Card(
+            // Card de Login
+            Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(containerColor = PureWhite),
@@ -256,7 +251,7 @@ fun LoginScreen(
                             enabled = !uiState.isLoading
                         ) {
                             if (uiState.isLoading) {
-                                CircularProgressIndicator(
+                                LoadingSpinner(
                                     modifier = Modifier.size(24.dp),
                                     color = PureWhite,
                                     strokeWidth = 2.dp
@@ -289,7 +284,6 @@ fun LoginScreen(
                         }
                     }
                 }
-            }
         }
     }
 }

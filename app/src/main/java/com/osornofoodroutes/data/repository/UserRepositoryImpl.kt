@@ -27,8 +27,9 @@ class UserRepositoryImpl(
                     password = user.password
                 )
             )
-            // Para simplificar, devolvemos 1 si es exitoso
-            if (response.success) 1L else -1L
+            // Retrofit lanza excepción si el código no es 2xx, así que si llegamos aquí, fue exitoso.
+            // Gson asigna 'false' por defecto si el campo success se omitió en el JSON del backend.
+            1L
         } catch (e: Exception) {
             -1L // Email duplicado u otro error
         }

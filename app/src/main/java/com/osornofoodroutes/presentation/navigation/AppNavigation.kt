@@ -48,7 +48,7 @@ fun AppNavigation(
                         routeViewModel.loadRoutes(user.id)
                     }
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             }
@@ -71,7 +71,7 @@ fun AppNavigation(
                 if (authState.registrationSuccess) {
                     authViewModel.clearRegistrationSuccess()
                     navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true } // Limpia la pila y va al login
+                        popUpTo(Screen.Register.route) { inclusive = true } 
                     }
                 }
             }
@@ -100,7 +100,7 @@ fun AppNavigation(
                     onLogout = {
                         authViewModel.logout()
                         navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
+                            popUpTo(Screen.Home.route) { inclusive = true }
                         }
                     }
                 )
@@ -108,7 +108,7 @@ fun AppNavigation(
                 // Seguridad: redirigir a login si no hay usuario autenticado
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 }
             }
@@ -193,7 +193,7 @@ fun AppNavigation(
                 // Seguridad: redirigir a login si no hay usuario autenticado
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(Screen.CreateRoute.route) { inclusive = true }
                     }
                 }
             }

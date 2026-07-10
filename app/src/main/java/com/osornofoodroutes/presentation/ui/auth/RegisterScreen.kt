@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.components.LoadingSpinner
 import com.osornofoodroutes.presentation.viewmodel.AuthUiState
 
 /**
@@ -50,9 +51,7 @@ fun RegisterScreen(
     var localError by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
 
-    // Animación de aparición
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { visible = true }
+    // Animación eliminada por estabilidad
 
     Box(
         modifier = Modifier
@@ -106,225 +105,220 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Card de Registro con animación
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
+            // Card de Registro
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = PureWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
             ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(containerColor = PureWhite),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
+                    // Nombre
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it; onClearError(); localError = null },
+                        label = { Text("Nombre completo") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Person, contentDescription = null, tint = Taupe)
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SageGreen,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = SageGreen,
+                            cursorColor = SageGreen
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Email
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it; onClearError(); localError = null },
+                        label = { Text("Email") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Email, contentDescription = null, tint = Taupe)
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SageGreen,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = SageGreen,
+                            cursorColor = SageGreen
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Contraseña
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it; onClearError(); localError = null },
+                        label = { Text("Contraseña") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    if (passwordVisible) Icons.Default.Visibility
+                                    else Icons.Default.VisibilityOff,
+                                    contentDescription = "Toggle password",
+                                    tint = Taupe
+                                )
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SageGreen,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = SageGreen,
+                            cursorColor = SageGreen
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Confirmar Contraseña
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it; localError = null },
+                        label = { Text("Confirmar contraseña") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
+                        },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() }
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SageGreen,
+                            unfocusedBorderColor = Sand,
+                            focusedLabelColor = SageGreen,
+                            cursorColor = SageGreen
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Errores
+                    AnimatedVisibility(visible = uiState.errorMessage != null || localError != null) {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = ErrorCoral.copy(alpha = 0.1f),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = localError ?: uiState.errorMessage ?: "",
+                                color = ErrorCoral,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Botón Registrar
+                    Button(
+                        onClick = {
+                            focusManager.clearFocus()
+                            when {
+                                name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> {
+                                    localError = "Completa todos los campos"
+                                }
+                                !email.contains("@") || !email.contains(".") -> {
+                                    localError = "Ingresa un email válido"
+                                }
+                                password.length < 4 -> {
+                                    localError = "La contraseña debe tener al menos 4 caracteres"
+                                }
+                                password != confirmPassword -> {
+                                    localError = "Las contraseñas no coinciden"
+                                }
+                                else -> {
+                                    localError = null
+                                    onRegister(name.trim(), email.trim(), password)
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(28.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .height(54.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SageGreen,
+                            contentColor = PureWhite
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                        enabled = !uiState.isLoading
                     ) {
-                        // Nombre
-                        OutlinedTextField(
-                            value = name,
-                            onValueChange = { name = it; onClearError(); localError = null },
-                            label = { Text("Nombre completo") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Person, contentDescription = null, tint = Taupe)
-                            },
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                            keyboardActions = KeyboardActions(
-                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = SageGreen,
-                                unfocusedBorderColor = Sand,
-                                focusedLabelColor = SageGreen,
-                                cursorColor = SageGreen
+                        if (uiState.isLoading) {
+                            LoadingSpinner(
+                                modifier = Modifier.size(24.dp),
+                                color = PureWhite,
+                                strokeWidth = 2.dp
                             )
-                        )
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Email
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { email = it; onClearError(); localError = null },
-                            label = { Text("Email") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Email, contentDescription = null, tint = Taupe)
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = SageGreen,
-                                unfocusedBorderColor = Sand,
-                                focusedLabelColor = SageGreen,
-                                cursorColor = SageGreen
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Contraseña
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it; onClearError(); localError = null },
-                            label = { Text("Contraseña") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
-                            },
-                            trailingIcon = {
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                    Icon(
-                                        if (passwordVisible) Icons.Default.Visibility
-                                        else Icons.Default.VisibilityOff,
-                                        contentDescription = "Toggle password",
-                                        tint = Taupe
-                                    )
-                                }
-                            },
-                            visualTransformation = if (passwordVisible) VisualTransformation.None
-                            else PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Password,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = SageGreen,
-                                unfocusedBorderColor = Sand,
-                                focusedLabelColor = SageGreen,
-                                cursorColor = SageGreen
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Confirmar Contraseña
-                        OutlinedTextField(
-                            value = confirmPassword,
-                            onValueChange = { confirmPassword = it; localError = null },
-                            label = { Text("Confirmar contraseña") },
-                            leadingIcon = {
-                                Icon(Icons.Default.Lock, contentDescription = null, tint = Taupe)
-                            },
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Password,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = { focusManager.clearFocus() }
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = SageGreen,
-                                unfocusedBorderColor = Sand,
-                                focusedLabelColor = SageGreen,
-                                cursorColor = SageGreen
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Errores
-                        AnimatedVisibility(visible = uiState.errorMessage != null || localError != null) {
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = ErrorCoral.copy(alpha = 0.1f),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = localError ?: uiState.errorMessage ?: "",
-                                    color = ErrorCoral,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // Botón Registrar
-                        Button(
-                            onClick = {
-                                focusManager.clearFocus()
-                                when {
-                                    name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> {
-                                        localError = "Completa todos los campos"
-                                    }
-                                    !email.contains("@") || !email.contains(".") -> {
-                                        localError = "Ingresa un email válido"
-                                    }
-                                    password.length < 4 -> {
-                                        localError = "La contraseña debe tener al menos 4 caracteres"
-                                    }
-                                    password != confirmPassword -> {
-                                        localError = "Las contraseñas no coinciden"
-                                    }
-                                    else -> {
-                                        localError = null
-                                        onRegister(name.trim(), email.trim(), password)
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(54.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = SageGreen,
-                                contentColor = PureWhite
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                            enabled = !uiState.isLoading
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = PureWhite,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Text(
-                                    "Registrarse",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    letterSpacing = 1.sp
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        TextButton(onClick = onNavigateToLogin) {
+                        } else {
                             Text(
-                                "¿Ya tienes cuenta? ",
-                                color = Taupe,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                "Inicia sesión",
-                                color = SageGreen,
+                                "Registrarse",
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                style = MaterialTheme.typography.bodyMedium
+                                letterSpacing = 1.sp
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    TextButton(onClick = onNavigateToLogin) {
+                        Text(
+                            "¿Ya tienes cuenta? ",
+                            color = Taupe,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "Inicia sesión",
+                            color = SageGreen,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

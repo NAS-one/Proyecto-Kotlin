@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.osornofoodroutes.domain.model.FoodPlace
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.components.LoadingSpinner
 import com.osornofoodroutes.presentation.ui.home.getCategoryEmoji
 import com.osornofoodroutes.presentation.viewmodel.FoodPlaceUiState
 
@@ -112,6 +113,8 @@ fun FoodPlaceListScreen(
                             labelColor = WarmBrown
                         ),
                         border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = uiState.selectedCategory == category,
                             borderColor = Sand,
                             selectedBorderColor = Terracotta
                         ),
@@ -126,7 +129,7 @@ fun FoodPlaceListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Terracotta)
+                    LoadingSpinner(color = Terracotta, size = 40.dp)
                 }
             } else if (filteredPlaces.isEmpty()) {
                 Box(

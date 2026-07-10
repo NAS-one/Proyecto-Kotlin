@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.osornofoodroutes.domain.model.FoodPlace
 import com.osornofoodroutes.domain.model.Route
 import com.osornofoodroutes.presentation.theme.*
+import com.osornofoodroutes.presentation.ui.components.LoadingSpinner
 import com.osornofoodroutes.presentation.viewmodel.RouteUiState
 
 /**
@@ -81,7 +82,7 @@ fun RouteListScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = SageGreen)
+                LoadingSpinner(color = SageGreen, size = 40.dp)
             }
         } else if (uiState.routes.isEmpty()) {
             Box(
