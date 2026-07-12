@@ -12,11 +12,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class UserRepository {
 
     fun insert(name: String, email: String, passwordHash: String): Int? = transaction {
-        UsersTable.insert {
+        val statement = UsersTable.insert {
             it[UsersTable.name] = name
             it[UsersTable.email] = email
             it[UsersTable.passwordHash] = passwordHash
-        }[UsersTable.id]
+        }
+        try {
+            statement[UsersTable.id]
+        } catch (e: Exception) {
+            UsersTable.select { UsersTable.email eq email }.singleOrNull()?.get(UsersTable.id)
+        }
     }
 
     fun findByEmail(email: String) = transaction {

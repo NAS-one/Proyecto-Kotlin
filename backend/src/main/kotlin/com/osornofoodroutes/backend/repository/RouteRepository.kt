@@ -16,13 +16,18 @@ class RouteRepository {
         name: String, description: String, userId: Int,
         foodPlaceIds: List<Int>, estimatedTime: String
     ): Int? = transaction {
-        RoutesTable.insert {
+        val statement = RoutesTable.insert {
             it[RoutesTable.name] = name
             it[RoutesTable.description] = description
             it[RoutesTable.userId] = userId
             it[RoutesTable.foodPlaceIds] = foodPlaceIds.joinToString(",")
             it[RoutesTable.estimatedTime] = estimatedTime
-        }[RoutesTable.id]
+        }
+        try {
+            statement[RoutesTable.id]
+        } catch (e: Exception) {
+            RoutesTable.select { RoutesTable.name eq name }.limit(1).firstOrNull()?.get(RoutesTable.id)
+        }
     }
 
     fun getByUserId(userId: Int): List<RouteResponse> = transaction {

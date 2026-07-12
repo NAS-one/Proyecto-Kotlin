@@ -61,6 +61,7 @@ class FoodPlaceViewModel(
                     _uiState.value = _uiState.value.copy(
                         successMessage = "Local agregado correctamente"
                     )
+                    loadFoodPlaces()
                 }
                 is AddFoodPlaceUseCase.Result.Error -> {
                     _uiState.value = _uiState.value.copy(
@@ -77,6 +78,7 @@ class FoodPlaceViewModel(
             _uiState.value = _uiState.value.copy(
                 successMessage = "Local actualizado correctamente"
             )
+            loadFoodPlaces()
         }
     }
 
@@ -86,6 +88,7 @@ class FoodPlaceViewModel(
             _uiState.value = _uiState.value.copy(
                 successMessage = "Local eliminado"
             )
+            loadFoodPlaces()
         }
     }
 

@@ -29,7 +29,7 @@ class RouteRepositoryImpl(
     override fun getRoutesByUserId(userId: Long): Flow<List<Route>> {
         return kotlinx.coroutines.flow.flow {
             try {
-                val routes = routeApi.getRoutesByUserId(userId).map { it.toDomain() }
+                val routes = routeApi.getRoutesByUserId().map { it.toDomain() }
                 emit(routes)
             } catch (e: Exception) {
                 emit(emptyList())

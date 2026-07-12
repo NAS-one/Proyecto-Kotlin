@@ -6,11 +6,11 @@ import com.osornofoodroutes.data.remote.dto.RouteResponse
 import retrofit2.http.*
 
 interface RouteApi {
-    @GET("routes")
+    @GET("routes/all")
     suspend fun getAllRoutes(): List<RouteResponse>
 
-    @GET("routes/user/{userId}")
-    suspend fun getRoutesByUserId(@Path("userId") userId: Long): List<RouteResponse>
+    @GET("routes")
+    suspend fun getRoutesByUserId(): List<RouteResponse>
 
     @GET("routes/{id}")
     suspend fun getRouteById(@Path("id") id: Long): RouteResponse

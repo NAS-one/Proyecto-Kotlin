@@ -27,11 +27,23 @@ class UserRepositoryImpl(
                     password = user.password
                 )
             )
-            // Retrofit lanza excepción si el código no es 2xx, así que si llegamos aquí, fue exitoso.
-            // Gson asigna 'false' por defecto si el campo success se omitió en el JSON del backend.
-            1L
+            if (response.isSuccessful) {
+                // HTTP 2xx → registro exitoso
+                android.util.Log.d("UserRepository", "Registro exitoso: ${response.code()}")
+                1L
+            } else {
+                // HTTP 4xx/5xx → error del servidor
+                android.util.Log.e("UserRepository", "Error del servidor al registrar: ${response.code()} - ${response.errorBody()?.string()}")
+                -1L
+            }
+        } catch (e: java.io.IOException) {
+            // Error de red (sin conexión, timeout, etc.)
+            android.util.Log.e("UserRepository", "Error de red al registrar", e)
+            -1L
         } catch (e: Exception) {
-            -1L // Email duplicado u otro error
+            // Otro error inesperado
+            android.util.Log.e("UserRepository", "Error inesperado al registrar: ${e::class.simpleName} - ${e.message}", e)
+            -1L
         }
     }
 

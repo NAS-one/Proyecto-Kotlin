@@ -53,6 +53,7 @@ class RouteViewModel(
                     _uiState.value = _uiState.value.copy(
                         successMessage = "Ruta creada correctamente"
                     )
+                    loadRoutes(route.userId)
                 }
                 is CreateRouteUseCase.Result.Error -> {
                     _uiState.value = _uiState.value.copy(
@@ -69,6 +70,7 @@ class RouteViewModel(
             _uiState.value = _uiState.value.copy(
                 successMessage = "Ruta eliminada"
             )
+            loadRoutes(route.userId)
         }
     }
 

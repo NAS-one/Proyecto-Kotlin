@@ -17,7 +17,7 @@ class FoodPlaceRepository {
         address: String, latitude: Double, longitude: Double,
         rating: Float, imageUrl: String, phone: String, openingHours: String
     ): Int? = transaction {
-        FoodPlacesTable.insert {
+        val statement = FoodPlacesTable.insert {
             it[FoodPlacesTable.name] = name
             it[FoodPlacesTable.description] = description
             it[FoodPlacesTable.category] = category
@@ -28,7 +28,12 @@ class FoodPlaceRepository {
             it[FoodPlacesTable.imageUrl] = imageUrl
             it[FoodPlacesTable.phone] = phone
             it[FoodPlacesTable.openingHours] = openingHours
-        }[FoodPlacesTable.id]
+        }
+        try {
+            statement[FoodPlacesTable.id]
+        } catch (e: Exception) {
+            FoodPlacesTable.select { FoodPlacesTable.name eq name }.limit(1).firstOrNull()?.get(FoodPlacesTable.id)
+        }
     }
 
     fun getAll(): List<FoodPlaceResponse> = transaction {
